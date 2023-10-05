@@ -84,10 +84,22 @@ public class BooksRepositoryTest
     [DataRow(50)]
     [DataRow(450)]
     [DataRow(500)]
-    public void Get_FilterByPrice(double maxPrice)
+    public void Get_ByPrice(double maxPrice)
     {
         var repository = new BooksRepository(true);
         var actualBooks = repository.Get(maxPrice);
+        actualBooks.ForEach(book => Assert.IsTrue(book.Price <= maxPrice));
+    }
+
+    [TestMethod]
+    [DataRow(25)]
+    [DataRow(50)]
+    [DataRow(450)]
+    [DataRow(500)]
+    public void Get_FilterByPrice(int maxPrice)
+    {
+        var repository = new BooksRepository(true);
+        var actualBooks = repository.Get(new Filter() {MaxPrice = maxPrice });
         actualBooks.ForEach(book => Assert.IsTrue(book.Price <= maxPrice));
     }
 
@@ -114,6 +126,28 @@ public class BooksRepositoryTest
     }
 
     [TestMethod]
+    public void Get_Filter_SortByTitle()
+    {
+        var repository = new BooksRepository(true);
+        var actualBooksSorted = repository.Get(new Filter() {BookSortValue = BookSortValue.Title});
+
+        Assert.AreEqual(_expectedBooks[3].Title, actualBooksSorted[0].Title);
+        Assert.AreEqual(_book4.Title, actualBooksSorted[0].Title);
+
+        Assert.AreEqual(_expectedBooks[0].Title, actualBooksSorted[1].Title);
+        Assert.AreEqual(_book1.Title, actualBooksSorted[1].Title);
+
+        Assert.AreEqual(_expectedBooks[2].Title, actualBooksSorted[2].Title);
+        Assert.AreEqual(_book3.Title, actualBooksSorted[2].Title);
+
+        Assert.AreEqual(_expectedBooks[4].Title, actualBooksSorted[3].Title);
+        Assert.AreEqual(_book5.Title, actualBooksSorted[3].Title);
+
+        Assert.AreEqual(_expectedBooks[1].Title, actualBooksSorted[4].Title);
+        Assert.AreEqual(_book2.Title, actualBooksSorted[4].Title);
+    }
+
+    [TestMethod]
     public void Get_SortByPrice()
     {
         var repository = new BooksRepository(true);
@@ -124,6 +158,23 @@ public class BooksRepositoryTest
         {
             Assert.IsTrue(sortedBooks[i].Price <= sortedBooks[j].Price);
             if (j < sortedBooks.Count -1)
+            {
+                j++;
+            }
+        }
+    }
+
+    [TestMethod]
+    public void Get_Filter_SortByPrice()
+    {
+        var repository = new BooksRepository(true);
+        var sortedBooks = repository.Get(new Filter() { BookSortValue = BookSortValue.Price} );
+
+        int j = 1;
+        for (int i = 0; i < sortedBooks.Count; i++)
+        {
+            Assert.IsTrue(sortedBooks[i].Price <= sortedBooks[j].Price);
+            if (j < sortedBooks.Count - 1)
             {
                 j++;
             }

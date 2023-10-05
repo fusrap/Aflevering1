@@ -7,10 +7,6 @@ using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BookLib
 {
-    public enum BookSortValue
-    {
-        Title,Price,NoSort
-    }
     public class BooksRepository
     {
         private List<Book> _books = new();
@@ -31,6 +27,18 @@ namespace BookLib
                 result = SortBooks(sortBy, result);
 
             return result;
+        }
+
+        public List<Book> Get(Filter? filter)
+        {
+            List<Book> result = new(_books);
+            if(filter is null) 
+                return result;
+
+            if (filter.BookSortValue is null)
+                return Get(filter.MaxPrice, BookSortValue.NoSort);
+
+            return Get(filter.MaxPrice,filter.BookSortValue.Value);
         }
 
         public Book? GetById(int id)
